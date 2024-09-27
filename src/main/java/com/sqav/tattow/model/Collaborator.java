@@ -24,7 +24,7 @@ public class Collaborator implements Serializable {
 	private String studioName;
 	private Sex sex;
 	private String zipCode;
-	private String fullAddres;
+	private String fullAddress;
 	private LocalDateTime insertDate;
 	
 	public Collaborator() {
@@ -44,7 +44,7 @@ public class Collaborator implements Serializable {
 		this.studioName = collaborator.getStudioName();
 		this.sex = collaborator.getSex();
 		this.zipCode = collaborator.getZipCode();
-		this.fullAddres = collaborator.getFullAddres();
+		this.fullAddress = collaborator.getFullAddress();
 	}
 
 	public Long getCollaboratorId() {
@@ -143,12 +143,12 @@ public class Collaborator implements Serializable {
 		this.zipCode = zipCode;
 	}
 	
-	public String getFullAddres() {
-		return fullAddres;
+	public String getFullAddress() {
+		return fullAddress;
 	}
 	
-	public void setFullAddres(String fullAddres) {
-		this.fullAddres = fullAddres;
+	public void setFullAddress(String fullAddress) {
+		this.fullAddress = fullAddress;
 	}
 	
 	public LocalDateTime getInsertDate() {
@@ -161,7 +161,7 @@ public class Collaborator implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cnpj, collaboratorId, cpf, mail, fullAddres, insertDate, name, phone, photo, sex,
+		return Objects.hash(cnpj, collaboratorId, cpf, mail, fullAddress, insertDate, name, phone, photo, sex,
 				studioName, userId, zipCode);
 	}
 
@@ -176,7 +176,7 @@ public class Collaborator implements Serializable {
 		Collaborator other = (Collaborator) obj;
 		return Objects.equals(cnpj, other.cnpj) && Objects.equals(collaboratorId, other.collaboratorId)
 				&& Objects.equals(cpf, other.cpf) && Objects.equals(mail, other.mail)
-				&& Objects.equals(fullAddres, other.fullAddres) && Objects.equals(insertDate, other.insertDate)
+				&& Objects.equals(fullAddress, other.fullAddress) && Objects.equals(insertDate, other.insertDate)
 				&& Objects.equals(name, other.name) && Objects.equals(phone, other.phone)
 				&& Objects.equals(photo, other.photo) && sex == other.sex
 				&& Objects.equals(studioName, other.studioName) && Objects.equals(userId, other.userId)

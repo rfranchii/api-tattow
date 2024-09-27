@@ -1,18 +1,21 @@
 package com.sqav.tattow.service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
 import com.sqav.tattow.enumerate.Profile;
 import com.sqav.tattow.exception.TattowException;
 import com.sqav.tattow.model.Collaborator;
 import com.sqav.tattow.model.User;
+import com.sqav.tattow.model.UserResult;
 import com.sqav.tattow.repository.UserRepository;
+import com.sqav.tattow.support.CellphoneValidator;
+import com.sqav.tattow.support.Cryptography;
 import com.sqav.tattow.support.Strings;
 import com.sqav.tattow.vo.LoginRequest;
 import com.sqav.tattow.vo.UserRequest;
@@ -23,7 +26,7 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
-	public List<User> login(LoginRequest loginRequest) {
+	public UserResult login(LoginRequest loginRequest) {
 		
 		if (loginRequest == null) {
 			throw new TattowException("Dados do login não informado.");
@@ -37,16 +40,35 @@ public class UserService {
 			throw new TattowException("Senha não informada.");
 		}
 		
-		return Lists.newArrayList(new User());
+		if (loginRequest.getProfile() == null) {
+			throw new TattowException("Perfil do login não informado.");
+		}
+		
+		String encryptedPassword;
+		try {
+			encryptedPassword = new Cryptography().encrypt(loginRequest.getPassword());
+		} catch (Exception e) {
+			throw new TattowException("Erro ao criptografar senha.");
+		}
+		
+		UserResult result = userRepository.getUserByLoginAndPasswordAndProfile(loginRequest.getLogin(), encryptedPassword, loginRequest.getProfile());
+		
+		if (result == null) {
+			throw new TattowException("Usuário não encontrado para o login e senha informados.");
+		}
+		
+		return result;
 	}
 
+	@Transactional
 	public void registerCollaboratorUser(UserRequest userRequest) {
 		validateCollaboratorFields(userRequest);
 		validatePassword(userRequest.getPassword());
+		userRequest.setPassword(new BasicPasswordEncryptor().encryptPassword(userRequest.getPassword()));
 		
 		User userDb = userRepository.createUser(new User(userRequest, Profile.COLLABORATOR));
 		
-//		userRepository.createCollaborator(new Collaborator(userDb.getUserId(), userRequest.getCollaborator()));
+		userRepository.createCollaborator(new Collaborator(userDb.getUserId(), userRequest.getCollaborator()));
 	}
 
 	private void validateCollaboratorFields(UserRequest request) {
@@ -82,13 +104,17 @@ public class UserService {
 			throw new TattowException("Email não informado.", "INFO");
 		}
 		
-		if (StringUtils.isBlank(request.getCollaborator().getCpf()) || StringUtils.isBlank(request.getCollaborator().getCnpj())) {
+		if (StringUtils.isBlank(request.getCollaborator().getCpf()) && StringUtils.isBlank(request.getCollaborator().getCnpj())) {
 			throw new TattowException("Cpf ou Cnpj não informado.", "INFO");
 		}
 		
 		if (StringUtils.isBlank(request.getCollaborator().getPhone())) {
 			throw new TattowException("Telefone não informado.", "INFO");
 		}		
+		
+		if (!CellphoneValidator.isCellphone(request.getCollaborator().getPhone())) {
+			throw new TattowException("Telefone inválido.", "INFO");
+		}
 		
 		if (request.getCollaborator().getBirthDate() == null) {
 			throw new TattowException("Data de nascimento não informada.", "INFO");
@@ -102,7 +128,7 @@ public class UserService {
 			throw new TattowException("CEP não informado.", "INFO");
 		}		
 
-		if (StringUtils.isBlank(request.getCollaborator().getFullAddres())) {
+		if (StringUtils.isBlank(request.getCollaborator().getFullAddress())) {
 			throw new TattowException("Endereço não informado.", "INFO");
 		}		
 	}

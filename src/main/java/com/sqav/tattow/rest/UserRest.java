@@ -27,9 +27,9 @@ public class UserRest extends BaseRest {
 	}
 	
 	@PostMapping(value="/register-collaborator")
-	public void registerCollaborator(@RequestBody UserRequest userRequest) {
+	public ResponseEntity<?> registerCollaborator(@RequestBody UserRequest userRequest) {
 		userService.registerCollaboratorUser(userRequest);
-		
+		return createObjectReturn(Boolean.TRUE);
 	}
 	
 }

@@ -2,6 +2,9 @@ package com.sqav.tattow.vo;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sqav.tattow.enumerate.Sex;
 
 public class CollaboratorRequest {
@@ -13,11 +16,13 @@ public class CollaboratorRequest {
 	private String cnpj;
 	private String photo;
 	private String phone;
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate birthDate;
 	private String studioName;
 	private Sex sex = Sex.UNDEFINED;
 	private String zipCode;
-	private String fullAddres;
+	private String fullAddress;
 
 	public CollaboratorRequest() {
 		super();
@@ -111,12 +116,12 @@ public class CollaboratorRequest {
 		this.zipCode = zipCode;
 	}
 
-	public String getFullAddres() {
-		return fullAddres;
+	public String getFullAddress() {
+		return fullAddress;
 	}
 
-	public void setFullAddres(String fullAddres) {
-		this.fullAddres = fullAddres;
+	public void setFullAddres(String fullAddress) {
+		this.fullAddress = fullAddress;
 	}
 	
 }
